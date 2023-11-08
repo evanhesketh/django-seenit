@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Seenit{% endblock %}
+
+{% block content %}
+<div>Seenit Homepage</div>
+
+{% for message in messages %}
+<div>{{ message }}</div>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div>Register Page</div>
+
+<form  action="{% url 'seenit:register' %}" method="POST">
+  {% csrf_token %}
+
+  {{ form }}
+
+  <input type="submit" value="Submit">
+</form>
+{% endblock %}
