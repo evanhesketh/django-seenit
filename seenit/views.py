@@ -1,7 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponseRedirect
+from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.views.generic.edit import CreateView
+
 from .forms import RegisterForm
+from .models import Channel
 
 
 def home(request):
@@ -9,7 +13,7 @@ def home(request):
 
 
 def register_user(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
             form.save()
@@ -22,3 +26,13 @@ def register_user(request):
     else:
         form = RegisterForm()
     return render(request, 'seenit/auth/register.html', {'form': form})
+
+
+class ChannelCreateView(CreateView):
+    model = Channel
+    fields = ["name"]
+    template_name = 'seenit/channel_form.html'
+
+    def get_success_url(self):
+        return reverse('seenit:home')
+
