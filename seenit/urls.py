@@ -10,5 +10,9 @@ urlpatterns = [
     path("register", views.register_user, name="register"),
     path("create_channel",
          views.ChannelCreateView.as_view(),
-         name="create_channel")
+         name="create_channel"),
+    path("channels", views.ChannelListView.as_view(), name="channels"),
+    path("channels/<int:channel_id>/new_post",
+         views.PostCreateView.as_view(),
+         name="new_post"),
 ]
