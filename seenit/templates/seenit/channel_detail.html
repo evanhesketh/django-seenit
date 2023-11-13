@@ -1,0 +1,21 @@
+{% extends "base.html" %} 
+
+{% block title %}{{channel.name}}{% endblock %}
+
+{% block content %}
+<div>{{channel.name}}</div>
+
+<div>
+  <h3>Create a post:</h3>
+  <form action="{% url 'seenit:channel-detail' pk=channel_id %}" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="submit">
+  </form>
+</div>
+
+{% for post in channel.posts.all %}
+
+<p>{{ post.title }}</p>
+
+{% endfor %} {% endblock %}
