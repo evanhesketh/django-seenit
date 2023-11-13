@@ -74,8 +74,8 @@ class ChannelDetailFormView(SingleObjectMixin, FormView):
         title = self.request.POST.get("title")
         text = self.request.POST.get("text")
         user = User.objects.get(pk=self.request.user.pk)
-        channel = Channel.objects.get(pk=self.kwargs['pk'])
-        post = Post(title=title, text=text, user_id=user, channel_id=channel)
+        post = Post(title=title, text=text,
+                    user_id=user, channel_id=self.object)
         post.save()
         return super().form_valid(form)
 
