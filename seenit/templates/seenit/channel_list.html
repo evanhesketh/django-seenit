@@ -5,10 +5,15 @@
 {% block content %}
 <div>Channels</div>
 
+<ul>
 {% for channel in channel_list %}
 
-<p>{{ channel.name }}</p>
+<li>
+  <a href="{% url 'seenit:channel-detail' pk=channel.id %}">
+    {{ channel.name }}
+  </a>
+</li>
 
 {% endfor %}
-
+</ul>
 {% endblock %}
