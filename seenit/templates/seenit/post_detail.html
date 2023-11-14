@@ -1,0 +1,31 @@
+{% extends "base.html" %} 
+
+{% block title %}{{post.title}}{% endblock %} 
+{% block content %}
+<div>
+  <h3>{{post.title}}</h3>
+  <p>{{post.text}}</p>
+</div>
+
+
+<div>
+  <h3>Comment:</h3>
+  <form
+  action="{% url 'seenit:post-detail' pk=post_id channel_id=post.channel.id %}"
+  method="POST"
+  >
+  {% csrf_token %} 
+  {{ form.as_p }}
+  <input type="submit" value="submit" />
+</form>
+</div>
+
+{% for comment in post.comments.all %}
+
+<div>
+  <p>{{comment.text}}</p>
+</div>
+
+{% endfor %} 
+
+{% endblock %}
