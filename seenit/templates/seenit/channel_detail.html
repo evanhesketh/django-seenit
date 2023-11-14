@@ -14,8 +14,16 @@
   </form>
 </div>
 
+<ul>
 {% for post in channel.posts.all %}
 
-<p>{{ post.title }}</p>
+<li>
+<a href="{% url 'seenit:post-detail' pk=post.id channel_id=channel_id%}">
+  {{ post.title }}
+</a>
+</li>
+{% endfor %} 
 
-{% endfor %} {% endblock %}
+</ul>
+
+{% endblock %}
