@@ -14,4 +14,6 @@ urlpatterns = [
     path("channels", views.ChannelListView.as_view(), name="channels"),
     path("channels/<int:pk>",
          views.ChannelView.as_view(), name="channel-detail"),
+    path("channels/<int:channel_id>/posts/<int:pk>",
+         views.PostView.as_view(), name="post-detail"),
 ]
