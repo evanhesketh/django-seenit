@@ -26,9 +26,9 @@ class Post(models.Model):
     title = models.CharField(max_length=100)
     text = models.CharField()
     rating = models.IntegerField(default=0)
-    channel_id = models.ForeignKey(
+    channel = models.ForeignKey(
         Channel, related_name="posts", on_delete=models.CASCADE)
-    user_id = models.ForeignKey(
+    user = models.ForeignKey(
         User, related_name="posts", on_delete=models.CASCADE)
 
 
@@ -37,8 +37,8 @@ class Comment(models.Model):
 
     text = models.CharField()
     rating = models.IntegerField(default=0)
-    post_id = models.ForeignKey(
+    post = models.ForeignKey(
         Post, related_name="comments", on_delete=models.CASCADE)
-    user_id = models.ForeignKey(
+    user = models.ForeignKey(
         User, related_name="comments", on_delete=models.CASCADE)
     replies = models.ManyToManyField("self", symmetrical=False, blank=True)
