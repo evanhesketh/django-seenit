@@ -16,4 +16,6 @@ urlpatterns = [
          views.ChannelView.as_view(), name="channel-detail"),
     path("channels/<int:channel_id>/posts/<int:pk>",
          views.PostView.as_view(), name="post-detail"),
+    path("api/v1/<int:pk>/upvote", views.UpVote, name="upvote"),
+    path("api/v1/<int:pk>/downvote", views.DownVote, name="downvote"),
 ]

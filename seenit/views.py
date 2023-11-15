@@ -1,5 +1,5 @@
 from django.http import HttpResponseForbidden, HttpResponseNotFound
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
@@ -144,3 +144,21 @@ class PostView(View):
     def post(self, request, *args, **kwargs):
         view = PostDetailFormView.as_view()
         return view(request, *args, **kwargs)
+
+
+def UpVote(request, *args, **kwargs):
+    next = request.POST.get('next', '/')
+    if request.method == "POST":
+        post = Post.objects.get(pk=kwargs['pk'])
+        post.rating += 1
+        post.save()
+    return HttpResponseRedirect(next)
+
+
+def DownVote(request, *args, **kwargs):
+    next = request.POST.get('next', '/')
+    if request.method == "POST":
+        post = Post.objects.get(pk=kwargs['pk'])
+        post.rating -= 1
+        post.save()
+    return HttpResponseRedirect(next)
