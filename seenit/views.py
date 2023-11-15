@@ -1,5 +1,7 @@
-from django.http import HttpResponseForbidden, HttpResponseNotFound
-from django.shortcuts import render, redirect, HttpResponseRedirect
+import json
+from django.http import (HttpResponseForbidden, HttpResponseNotFound,
+                         JsonResponse)
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
@@ -7,6 +9,7 @@ from django.views import View
 from django.views.generic.edit import CreateView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic import ListView, DetailView, FormView
+from django.views.decorators.csrf import csrf_exempt
 
 from .forms import RegisterForm, PostForm, CommentForm
 from .models import User, Channel, Post, Comment
@@ -146,19 +149,43 @@ class PostView(View):
         return view(request, *args, **kwargs)
 
 
-def UpVote(request, *args, **kwargs):
-    next = request.POST.get('next', '/')
+@csrf_exempt
+def upvote(request):
     if request.method == "POST":
-        post = Post.objects.get(pk=kwargs['pk'])
-        post.rating += 1
-        post.save()
-    return HttpResponseRedirect(next)
+        body = json.loads(request.body)
+        id = body['id']
+        type = body['type']
+
+        print("id=", id, "type=", type)
+
+        if type == "post":
+            post = Post.objects.get(pk=id)
+            post.rating += 1
+            post.save()
+
+        elif type == "comment":
+            comment = Comment.objects.get(pk=id)
+            comment.rating += 1
+            comment.save()
+        return JsonResponse({"updated": id, "type": type})
+    return HttpResponseForbidden()
 
 
-def DownVote(request, *args, **kwargs):
-    next = request.POST.get('next', '/')
+@csrf_exempt
+def downvote(request):
     if request.method == "POST":
-        post = Post.objects.get(pk=kwargs['pk'])
-        post.rating -= 1
-        post.save()
-    return HttpResponseRedirect(next)
+        body = json.loads(request.body)
+        id = body['id']
+        type = body['type']
+
+        if type == "post":
+            post = Post.objects.get(pk=id)
+            post.rating -= 1
+            post.save()
+
+        elif type == "comment":
+            comment = Comment.objects.get(pk=id)
+            comment.rating -= 1
+            comment.save()
+        return JsonResponse({"updated": id, "type": type})
+    return HttpResponseForbidden()
