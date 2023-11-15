@@ -1,6 +1,6 @@
 "use strict";
 
-const POST_CONTAINER = document.getElementById("post-container");
+const POST_CONTAINERS = document.getElementsByClassName("post-container");
 const UP_VOTE = document.getElementsByClassName("upvote");
 const DOWN_VOTE = document.getElementsByClassName("downvote");
 const BASE_URL = 'http://localhost:8000';
@@ -39,18 +39,18 @@ async function downVote(target) {
 
 
 window.addEventListener('load', function() {
-  POST_CONTAINER.addEventListener("click", async function(evt) {
-    const upVoteTarget = evt.target.closest('.upvote');
-    const downVoteTarget = evt.target.closest('.downvote');
-    
-    if (upVoteTarget) {
-      upVote(upVoteTarget);
-    }
-    
-    if (downVoteTarget) {
-      downVote(downVoteTarget);
-    }
-  });
+  for (let elem of POST_CONTAINERS) {
+      elem.addEventListener("click", async function(evt) {
+      const upVoteTarget = evt.target.closest('.upvote');
+      const downVoteTarget = evt.target.closest('.downvote');
+      
+      if (upVoteTarget) {
+        upVote(upVoteTarget);
+      }
+      
+      if (downVoteTarget) {
+        downVote(downVoteTarget);
+      }
+    });
+  }
 });
-
-// DOWN_VOTE.addEventListener("click", downVote);
