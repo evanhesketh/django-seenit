@@ -1,7 +1,7 @@
 import json
 from django.http import (HttpResponseForbidden, HttpResponseNotFound,
                          JsonResponse)
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
@@ -107,6 +107,7 @@ class PostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['first_comments'] = self.object.comments.filter(is_reply=False)
         context['post_id'] = self.kwargs['pk']
         context['form'] = CommentForm()
         return context
@@ -147,6 +148,24 @@ class PostView(View):
     def post(self, request, *args, **kwargs):
         view = PostDetailFormView.as_view()
         return view(request, *args, **kwargs)
+
+
+def handle_reply(request, *args, **kwargs):
+    text = request.POST.get('text')
+    user = User.objects.get(pk=request.user.pk)
+    post = Post.objects.get(pk=kwargs['post_id'])
+    reply = Comment(text=text, is_reply=True, user=user, post=post)
+    reply.save()
+    comment = Comment.objects.get(pk=kwargs['pk'])
+    comment.replies.add(reply)
+    comment.save()
+
+    return HttpResponseRedirect(
+        reverse("seenit:post-detail",
+                kwargs={"pk": kwargs['post_id'],
+                        "channel_id": kwargs['channel_id']
+                        }
+                ))
 
 
 @csrf_exempt
