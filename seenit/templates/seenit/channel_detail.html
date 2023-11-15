@@ -1,29 +1,87 @@
 {% extends "base.html" %} 
 
-{% block title %}{{channel.name}}{% endblock %}
+{% block title %}{{channel.name}}{% endblock %} 
 
-{% block content %}
-<div>{{channel.name}}</div>
+{% block content %} 
 
-<div>
-  <h3>Create a post:</h3>
-  <form action="{% url 'seenit:channel-detail' pk=channel_id %}" method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="submit">
-  </form>
+{% load tailwind_filters %}
+{% load static %}
+
+<div class="flex justify-center">
+  <div class="w-1/3">
+    <h1 class="text-2xl">{{channel.name}}</h1>
+    <div>
+      <h3 class="text-lg">Create a post:</h3>
+      <form
+        action="{% url 'seenit:channel-detail' pk=channel_id %}"
+        method="POST"
+      >
+        {% csrf_token %} {{ form|crispy }}
+        <button class="bg-green-500 py-2 px-4 rounded">Post</button>
+      </form>
+    </div>
+    <div id="post-container">
+    {% for post in channel.posts.all %}
+    <div class="border border-black my-3">
+      <div class="flex">
+        <div class="px-2 bg-stone-300 flex flex-col items-center">
+          <form action="{% url 'seenit:upvote' pk=post.id %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+          <button type="submit">
+          <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="upvote w-6 h-6 z-50 hover:bg-stone-400"
+          data-postId = {post.id}
+          >
+          <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75"
+          />
+        </svg>
+        </button>
+      </form>
+        
+        <div>{{post.rating}}</div>
+        <form action="{% url 'seenit:downvote' pk=post.id %}" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.path }}">
+          <button type="submit">
+        <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="downvote w-6 h-6 z-50 hover:bg-stone-400"
+        >
+        <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75"
+        />
+      </svg>
+    </button>
+        </form>
+    </div>
+    <a href="{% url 'seenit:post-detail' pk=post.id channel_id=channel_id%}">
+    <div class="px-4">
+      <p class="text-xs">Posted by {{post.user.username}}</p>
+      <h4 class="text-gray-500 text-lg">{{ post.title }}</h4>
+    </div>
+  </div>
+</div>
+</a>
+
+{% endfor %}
+</div>
+</div>
 </div>
 
-<ul>
-{% for post in channel.posts.all %}
-
-<li>
-<a href="{% url 'seenit:post-detail' pk=post.id channel_id=channel_id%}">
-  {{ post.title }}
-</a>
-</li>
-{% endfor %} 
-
-</ul>
-
+<script src="{% static 'app.js' %}"></script>
 {% endblock %}
