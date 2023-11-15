@@ -46,6 +46,7 @@ class Comment(models.Model):
     text = models.CharField()
     rating = models.IntegerField(default=0)
     pub_date = models.DateTimeField(default=timezone.now)
+    is_reply = models.BooleanField(default=False)
     post = models.ForeignKey(
         Post, related_name="comments", on_delete=models.CASCADE)
     user = models.ForeignKey(
