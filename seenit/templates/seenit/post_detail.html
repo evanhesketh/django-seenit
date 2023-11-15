@@ -31,16 +31,45 @@
   </form>
 </div>
 <div class="post-container">
-  {% for comment in post.comments.all %}
+  {% for comment in first_comments %}
   <div class="border border-black my-3">
     <div class="flex">
       {% include "rating_base.html" with rating=comment.rating postType="comment" postId=comment.id %}
       <div class="px-4">
         <p class="text-xs">Posted by {{comment.user.username}}</p>
-        <h4 class="text-gray-500 text-lg">{{ comment.text }}</h4>
+        <p>{{ comment.text }}</p>
+        <button class="reply-btn bg-green-300 px-2 rounded">Reply</button>
+        <form
+    action="{% url 'seenit:reply' pk=comment.id channel_id=post.channel.id post_id=post.id %}"
+    method="POST"
+    style="display:none"
+  >
+    {% csrf_token %} {{ form|crispy }}
+    <button class="bg-green-500 py-2 px-4 rounded">Reply</button>
+  </form>
       </div>
     </div>
   </div>
+  {% for reply in comment.replies.all %}
+  <div class="border border-black my-3 mx-10">
+    <div class="flex">
+      {% include "rating_base.html" with rating=reply.rating postType="comment" postId=reply.id %}
+      <div class="px-4">
+        <p class="text-xs">Posted by {{reply.user.username}}</p>
+        <p>{{ reply.text }}</p>
+        <button class="reply-btn bg-green-300 px-2 rounded">Reply</button>
+        <form
+    action="{% url 'seenit:reply' pk=comment.id channel_id=post.channel.id post_id=post.id %}"
+    method="POST"
+    style="display:none"
+  >
+    {% csrf_token %} {{ form|crispy }}
+    <button class="bg-green-500 py-2 px-4 rounded">Reply</button>
+  </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
   {% endfor %}
 </div>
 </div>
