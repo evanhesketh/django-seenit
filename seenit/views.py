@@ -4,6 +4,7 @@ from django.http import (HttpResponseForbidden, HttpResponseNotFound,
 from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views import View
 from django.views.generic.edit import CreateView
@@ -14,7 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import RegisterForm, PostForm, CommentForm
 from .models import User, Channel, Post, Comment
 
-
+@login_required()
 def home(request):
     return render(request, 'seenit/home.html', {})
 

@@ -144,6 +144,7 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'
 
+LOGIN_URL = 'accounts/login/'
 
 # Log to console
 
