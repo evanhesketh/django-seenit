@@ -8,7 +8,7 @@ class User(AbstractUser):
 
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(unique=True)
-    password = models.CharField(db_column='hashed_password')
+    password = models.CharField(max_length=400, db_column='hashed_password')
     # posts -> refers to Posts
     # subscribed_channels -> refers to Channel
 
@@ -28,7 +28,7 @@ class Post(models.Model):
         ordering = ['-rating', '-pub_date']
 
     title = models.CharField(max_length=100)
-    text = models.CharField()
+    text = models.TextField()
     rating = models.IntegerField(default=0)
     pub_date = models.DateTimeField(default=timezone.now)
     channel = models.ForeignKey(
@@ -43,7 +43,7 @@ class Comment(models.Model):
     class Meta:
         ordering = ['-rating', '-pub_date']
 
-    text = models.CharField()
+    text = models.TextField()
     rating = models.IntegerField(default=0)
     pub_date = models.DateTimeField(default=timezone.now)
     is_reply = models.BooleanField(default=False)
