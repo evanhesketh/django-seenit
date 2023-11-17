@@ -18,7 +18,7 @@
       </div>
     </div>
   </div>
-  {% if comment.replies.all %}
+  {% if comment.replies.count > 0 %}
   <ul>
     {% for reply in comment.replies.all %} 
       {% with comment=reply template_name="comment_template.html" %} 
