@@ -29,7 +29,7 @@ class Post(models.Model):
     class Meta:
         ordering = ['-rating', '-pub_date']
 
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=255)
     text = models.TextField()
     rating = models.IntegerField(default=0)
     pub_date = models.DateTimeField(default=timezone.now)
