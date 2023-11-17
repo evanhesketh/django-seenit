@@ -107,7 +107,10 @@ class PostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['first_comments'] = self.object.comments.filter(is_reply=False)
+        comments = Comment.objects.filter(post=self.object)
+        for comment in comments:
+            print(comment.parent)
+        context['comments'] = Comment.objects.filter(post=self.object)
         context['post_id'] = self.kwargs['pk']
         context['form'] = CommentForm()
         return context
@@ -154,11 +157,9 @@ def handle_reply(request, *args, **kwargs):
     text = request.POST.get('text')
     user = User.objects.get(pk=request.user.pk)
     post = Post.objects.get(pk=kwargs['post_id'])
-    reply = Comment(text=text, is_reply=True, user=user, post=post)
+    parent = Comment.objects.get(pk=kwargs['pk'])
+    reply = Comment(text=text, user=user, post=post, parent=parent)
     reply.save()
-    comment = Comment.objects.get(pk=kwargs['pk'])
-    comment.replies.add(reply)
-    comment.save()
 
     return HttpResponseRedirect(
         reverse("seenit:post-detail",
@@ -174,8 +175,6 @@ def upvote(request):
         body = json.loads(request.body)
         id = body['id']
         type = body['type']
-
-        print("id=", id, "type=", type)
 
         if type == "post":
             post = Post.objects.get(pk=id)
