@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'seenit.apps.SeenitConfig',
     "crispy_forms",
     "crispy_tailwind",
+    "django_seed",
 ]
 
 MIDDLEWARE = [
