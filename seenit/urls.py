@@ -8,6 +8,7 @@ app_name = "seenit"
 urlpatterns = [
     path("", views.home, name="home"),
     path("register", views.register_user, name="register"),
+    path("users/<int:pk>", views.UserDetailView.as_view(), name="user_detail"),
     path("create_channel",
          views.ChannelCreateView.as_view(),
          name="create_channel"),
