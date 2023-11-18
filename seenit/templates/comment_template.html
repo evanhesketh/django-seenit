@@ -1,14 +1,19 @@
 {% load tailwind_filters %}
+
+{% load mptt_tags %}
+
+{% recursetree comments %}
+<ul>
 <li>
   <div class="border border-black my-3 mx-10">
     <div class="flex">
-      {% include "rating_base.html" with rating=comment.rating postType="comment" postId=comment.id %}
+      {% include "rating_base.html" with rating=node.rating postType="comment" postId=node.id %}
       <div class="px-4">
-        <p class="text-xs">Posted by {{comment.user.username}}</p>
-        <p>{{ comment.text }}</p>
+        <p class="text-xs">Posted by {{node.user.username}}</p>
+        <p>{{ node.text }}</p>
         <button class="reply-btn bg-green-300 px-2 rounded">Reply</button>
         <form
-          action="{% url 'seenit:reply' pk=comment.id channel_id=post.channel.id post_id=post.id %}"
+          action="{% url 'seenit:reply' pk=node.id channel_id=post.channel.id post_id=post.id %}"
           method="POST"
           style="display: none"
         >
@@ -18,13 +23,11 @@
       </div>
     </div>
   </div>
-  {% if comment.replies.exists %}
-  <ul>
-    {% for reply in comment.replies.all %} 
-      {% with comment=reply template_name="comment_template.html" %} 
-        {% include template_name %} 
-      {% endwith %} 
-    {% endfor %}
-  </ul>
+  {% if not node.is_leaf_node %}
+  
+  {{ children }}
+  
   {% endif %}
 </li>
+</ul>
+{% endrecursetree %}

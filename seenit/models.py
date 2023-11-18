@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
+from mptt.models import MPTTModel, TreeForeignKey
+
 
 class User(AbstractUser):
     """Model for a user."""
@@ -27,7 +29,7 @@ class Post(models.Model):
     class Meta:
         ordering = ['-rating', '-pub_date']
 
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=255)
     text = models.TextField()
     rating = models.IntegerField(default=0)
     pub_date = models.DateTimeField(default=timezone.now)
@@ -37,18 +39,18 @@ class Post(models.Model):
         User, related_name="posts", on_delete=models.CASCADE)
 
 
-class Comment(models.Model):
+class Comment(MPTTModel):
     """model for a comment on a post."""
-
-    class Meta:
-        ordering = ['-rating', '-pub_date']
 
     text = models.TextField()
     rating = models.IntegerField(default=0)
     pub_date = models.DateTimeField(default=timezone.now)
-    is_reply = models.BooleanField(default=False)
+    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True,
+                            blank=True, related_name='children')
     post = models.ForeignKey(
         Post, related_name="comments", on_delete=models.CASCADE)
     user = models.ForeignKey(
         User, related_name="comments", on_delete=models.CASCADE)
-    replies = models.ManyToManyField("self", symmetrical=False, blank=True)
+
+    class MPTTMeta:
+        order_insertion_by = ['-rating', '-pub_date']
