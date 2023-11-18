@@ -1,0 +1,10 @@
+{{user}}
+<nav>
+  <a href="{% url 'seenit:home' %}">Home</a>
+  {% if user %}
+  <a href="{% url 'seenit:channels' %}">Channels</a>
+  <a href="{% url 'logout' %}">Logout</a>
+  {% else %}
+  <a href="{% url 'login' %}">Login</a>
+  {% endif %}
+</nav>

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex flex-col items-center mt-20">
+  <p>Logged out!</p>
+  <a href="{% url 'login'%}" class="underline text-blue-500">Click here to login again.</a>
+</div>
+{% endblock %}
