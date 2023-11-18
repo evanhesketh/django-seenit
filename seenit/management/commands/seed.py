@@ -21,12 +21,14 @@ class Command(BaseCommand):
         self.root_comments = options['root_comments']
         self.random_usernames = [self.get_random_username()
                                  for _ in range(100)]
+        self.channels = [self.get_or_create_channel() for _ in range(50)]
+
         for index, _ in enumerate(range(self.thread_count)):
             print("Thread {} out of {}".format(str(index), self.thread_count))
             selftext = self.get_random_sentence()
             title = self.get_random_sentence(max_words=20, max_word_len=10)
             user = self.get_or_create_author(choice(self.random_usernames))
-            channel = self.get_or_create_channel()
+            channel = choice(self.channels)
 
             post = Post(user=user,
                         title=title,
@@ -86,6 +88,8 @@ class Command(BaseCommand):
             new_user = User(username=username, password='greatpassword123',
                             email=f'{username}@test.com')
             new_user.save()
+            for _ in range(0, randint(1, 10)):
+                new_user.subscribed_channels.add(choice(self.channels))
             return new_user
 
     def add_replies(self, root_comment, depth=1):
