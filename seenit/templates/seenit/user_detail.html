@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content%}
+<div class="flex flex-col items-center">
+<div class="w-[400px] sm:w-[600px]">
+<h1 class="text-xl mt-10">Hello, {{object.username}}</h1>
+<div class="mt-10">
+  <p>You are subscribed to:</p>
+  <ul>
+  {% for channel in object.subscribed_channels.all %}
+  <li class="my-3 text-blue-500 underline"><a href="{% url 'seenit:channel-detail' pk=channel.id %}">{{ channel.name }}</a></li>
+  {% endfor %}
+</ul>
+</div>
+<div>
+  <p>Here are some highlights from your channels:</p>
+  <ul>
+  {% for post_group in channel_highlights %}
+    {% for post in post_group %}
+    <a href="{% url 'seenit:post-detail' pk=post.id channel_id=post.channel.id %}">
+      {% include 'post_template.html' with post=post %}
+    </a>
+    {% endfor %}
+  {% endfor %}
+</ul>
+</div>
+</div>
+</div>
+
+{% endblock %}
