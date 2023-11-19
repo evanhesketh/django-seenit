@@ -6,6 +6,10 @@
 
 {% block title %}{{post.title}}{%endblock %} 
 
+{% block nav %} 
+  {% include 'navbar.html' with user=request.user %}
+{% endblock%} 
+
 {% block content %}
 <div class="flex justify-center">
   <div class="w-[400px] sm:w-[600px]">
