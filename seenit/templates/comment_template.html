@@ -7,7 +7,7 @@
 <li>
   <div class="border border-black my-3 mx-10">
     <div class="flex">
-      {% include "rating_base.html" with rating=node.rating postType="comment" postId=node.id %}
+      {% include "comment_rating_base.html" with rating=node.rating comment=node post_type='comment' %}
       <div class="px-4">
         <p class="text-xs">Posted by {{node.user.username}}</p>
         <p>{{ node.text }}</p>

@@ -16,7 +16,7 @@
     <div class="post-container">
       <div class="border border-black my-3">
         <div class="flex">
-          {% include "rating_base.html" with rating=post.rating postType="post" postId=post.id %}
+          {% include "post_rating_base.html" with rating=post.rating post=post post_type='post' %}
           <div class="px-4">
             <p class="text-xs">Posted by {{post.user.username}}</p>
             <h4 class="text-gray-500 text-lg">{{ post.title }}</h4>

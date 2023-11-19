@@ -43,7 +43,7 @@
     {% for post in channel.posts.all %}
     <div class="border border-black my-3">
       <div class="flex">
-        {% include "rating_base.html" with rating=post.rating postType="post" postId=post.id %}
+        {% include "post_rating_base.html" with rating=post.rating post_type="post" post=post %}
     <a href="{% url 'seenit:post-detail' pk=post.id channel_id=channel_id%}">
     <div class="px-4">
       <p class="text-xs">Posted by {{post.user.username}}</p>
