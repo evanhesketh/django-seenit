@@ -22,6 +22,11 @@ class Channel(models.Model):
     subscribed_users = models.ManyToManyField(
         User, related_name="subscribed_channels", blank=True)
 
+    def determine_if_user_subscribed(self, user):
+        if user in self.subscribed_users.filter(id=user.id):
+            return True
+        return False
+
 
 class Post(models.Model):
     """Model for a post."""
