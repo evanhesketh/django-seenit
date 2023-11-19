@@ -2,18 +2,24 @@
 
 {% block title %}Channels{% endblock %}
 
+{% block nav %} 
+  {% include 'navbar.html' with user=request.user %}
+{% endblock%}
+
 {% block content %}
-<div>Channels</div>
+<div class="flex flex-col items-center">
+<h1 class="text-lg my-4">Channels</h1>
 
 <ul>
 {% for channel in channel_list %}
 
 <li>
-  <a href="{% url 'seenit:channel-detail' pk=channel.id %}">
+  <a href="{% url 'seenit:channel-detail' pk=channel.id %}" class="text-blue-500 underline">
     {{ channel.name }}
   </a>
 </li>
 
 {% endfor %}
 </ul>
+</div>
 {% endblock %}
