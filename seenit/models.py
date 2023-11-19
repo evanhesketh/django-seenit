@@ -11,8 +11,14 @@ class User(AbstractUser):
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=400, db_column='hashed_password')
-    # posts -> refers to Posts
-    # subscribed_channels -> refers to Channel
+    # related names:
+
+    # posts
+    # subscribed_channels
+    # comment_up_votes
+    # comment_down_votes
+    # post_up_votes
+    # post_down_votes
 
 
 class Channel(models.Model):
@@ -37,6 +43,10 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     text = models.TextField()
     rating = models.IntegerField(default=0)
+    up_votes = models.ManyToManyField(
+        User, related_name="post_up_votes", blank=True)
+    down_votes = models.ManyToManyField(
+        User, related_name="post_down_votes", blank=True)
     pub_date = models.DateTimeField(default=timezone.now)
     channel = models.ForeignKey(
         Channel, related_name="posts", on_delete=models.CASCADE)
@@ -49,6 +59,10 @@ class Comment(MPTTModel):
 
     text = models.TextField()
     rating = models.IntegerField(default=0)
+    up_votes = models.ManyToManyField(
+        User, related_name="comment_up_votes", blank=True)
+    down_votes = models.ManyToManyField(
+        User, related_name="comment_down_votes", blank=True)
     pub_date = models.DateTimeField(default=timezone.now)
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True,
                             blank=True, related_name='children')
