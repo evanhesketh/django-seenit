@@ -2,7 +2,8 @@ import json
 
 from django.http import (HttpResponseForbidden, HttpResponseNotFound,
                          JsonResponse)
-from django.shortcuts import render, redirect, HttpResponseRedirect
+from django.shortcuts import (render, redirect, HttpResponseRedirect,
+                              get_object_or_404)
 from django.urls import reverse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -19,7 +20,8 @@ from .models import User, Channel, Post, Comment
 
 @login_required()
 def home(request):
-    return render(request, 'seenit/home.html', {})
+    return redirect(reverse('seenit:user_detail',
+                            kwargs={"pk": request.user.id}))
 
 
 def register_user(request):
@@ -45,7 +47,8 @@ class UserDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         subscribed_channels = self.object.subscribed_channels.all()
         print("subscribed_channels=", subscribed_channels)
-        context['channel_highlights'] = [channel.posts.all()[:2] for channel in subscribed_channels]
+        context['channel_highlights'] = [channel.posts.all()[:2]
+                                         for channel in subscribed_channels]
         print("context=", context)
         return context
 
@@ -74,6 +77,10 @@ class ChannelDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['channel_id'] = self.kwargs['pk']
         context['form'] = PostForm()
+        user_subscribed = self.object.determine_if_user_subscribed(
+            self.request.user)
+        print("user_subscribed=", user_subscribed)
+        context['user_subscribed'] = user_subscribed
         return context
 
 
@@ -221,4 +228,28 @@ def downvote(request):
             comment.rating -= 1
             comment.save()
         return JsonResponse({"updated": id, "type": type})
+    return HttpResponseForbidden()
+
+
+def subscribe(request, **kwargs):
+    if request.method == "POST":
+        channel_id = kwargs['channel_id']
+        user_id = kwargs['user_id']
+        user = get_object_or_404(User, pk=user_id)
+        channel = get_object_or_404(Channel, pk=channel_id)
+        user.subscribed_channels.add(channel)
+        return HttpResponseRedirect(reverse("seenit:channel-detail",
+                                            kwargs={"pk": channel_id}))
+    return HttpResponseForbidden()
+
+
+def unsubscribe(request, **kwargs):
+    if request.method == "POST":
+        channel_id = kwargs['channel_id']
+        user_id = kwargs['user_id']
+        user = get_object_or_404(User, pk=user_id)
+        channel = get_object_or_404(Channel, pk=channel_id)
+        user.subscribed_channels.remove(channel)
+        return HttpResponseRedirect(reverse("seenit:channel-detail",
+                                            kwargs={"pk": channel_id}))
     return HttpResponseForbidden()
