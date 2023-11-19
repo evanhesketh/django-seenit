@@ -79,7 +79,7 @@ class ChannelDetailView(DetailView):
         context['form'] = PostForm()
         user_subscribed = self.object.determine_if_user_subscribed(
             self.request.user)
-        print("user_subscribed=", user_subscribed)
+        
         context['user_subscribed'] = user_subscribed
         return context
 
@@ -191,43 +191,56 @@ def handle_reply(request, *args, **kwargs):
                 ))
 
 
-@csrf_exempt
-def upvote(request):
+def upvote(request, **kwargs):
     if request.method == "POST":
-        body = json.loads(request.body)
-        id = body['id']
-        type = body['type']
+        id = kwargs['pk']
+        type = kwargs['post_type']
 
         if type == "post":
             post = Post.objects.get(pk=id)
             post.rating += 1
             post.save()
+            if post.down_votes.filter(id=request.user.id).exists():
+                post.down_votes.remove(request.user)
+            else:
+                post.up_votes.add(request.user)
 
         elif type == "comment":
             comment = Comment.objects.get(pk=id)
+            print("comment=", comment)
             comment.rating += 1
             comment.save()
-        return JsonResponse({"updated": id, "type": type})
+            if comment.down_votes.filter(id=request.user.id).exists():
+                comment.down_votes.remove(request.user)
+            else:
+                comment.up_votes.add(request.user)
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
     return HttpResponseForbidden()
 
 
-@csrf_exempt
-def downvote(request):
+def downvote(request, **kwargs):
     if request.method == "POST":
-        body = json.loads(request.body)
-        id = body['id']
-        type = body['type']
+        id = kwargs['pk']
+        type = kwargs['post_type']
 
         if type == "post":
             post = Post.objects.get(pk=id)
             post.rating -= 1
             post.save()
+            if post.up_votes.filter(id=request.user.id).exists():
+                post.up_votes.remove(request.user)
+            else:
+                post.down_votes.add(request.user)
 
         elif type == "comment":
             comment = Comment.objects.get(pk=id)
             comment.rating -= 1
             comment.save()
-        return JsonResponse({"updated": id, "type": type})
+            if comment.up_votes.filter(id=request.user.id).exists():
+                comment.up_votes.remove(request.user)
+            else:
+                comment.down_votes.add(request.user)
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
     return HttpResponseForbidden()
 
 
