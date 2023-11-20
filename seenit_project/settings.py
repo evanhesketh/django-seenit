@@ -142,8 +142,8 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 
 CRISPY_TEMPLATE_PACK = "tailwind"
 
-# Redirect to user detail page after login
-LOGIN_REDIRECT_URL = 'seenit:user_detail'
+# Redirect to home page after login
+LOGIN_REDIRECT_URL = 'seenit:home'
 
 LOGIN_URL = 'accounts/login/'
 
