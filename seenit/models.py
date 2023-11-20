@@ -53,6 +53,34 @@ class Post(models.Model):
     user = models.ForeignKey(
         User, related_name="posts", on_delete=models.CASCADE)
 
+    def upvote(self, user):
+        """Handle upvote.
+        If user has already downvoted, remove user from down_votes.
+        Otherwise, add user to up_votes.
+        """
+
+        self.rating += 1
+        self.save()
+
+        if self.down_votes.filter(id=user.id).exists():
+            self.down_votes.remove(user)
+        else:
+            self.up_votes.add(user)
+
+    def downvote(self, user):
+        """Handle downvote.
+        If user has already upvoted, remove user from up_votes.
+        Otherwise, add user to down_votes.
+        """
+
+        self.rating -= 1
+        self.save()
+
+        if self.up_votes.filter(id=user.id).exists():
+            self.up_votes.remove(user)
+        else:
+            self.down_votes.add(user)
+
 
 class Comment(MPTTModel):
     """model for a comment on a post."""
@@ -73,3 +101,31 @@ class Comment(MPTTModel):
 
     class MPTTMeta:
         order_insertion_by = ['-rating', '-pub_date']
+
+    def upvote(self, user):
+        """Handle upvote.
+        If user has already downvoted, remove user from down_votes.
+        Otherwise, add user to up_votes.
+        """
+
+        self.rating += 1
+        self.save()
+
+        if self.down_votes.filter(id=user.id).exists():
+            self.down_votes.remove(user)
+        else:
+            self.up_votes.add(user)
+
+    def downvote(self, user):
+        """Handle downvote.
+        If user has already upvoted, remove user from up_votes.
+        Otherwise, add user to down_votes.
+        """
+
+        self.rating -= 1
+        self.save()
+
+        if self.up_votes.filter(id=user.id).exists():
+            self.up_votes.remove(user)
+        else:
+            self.down_votes.add(user)

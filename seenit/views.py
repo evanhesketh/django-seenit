@@ -282,22 +282,12 @@ def upvote(request, **kwargs):
 
         if type == "post":
             post = Post.objects.get(pk=id)
-            post.rating += 1
-            post.save()
-            if post.down_votes.filter(id=request.user.id).exists():
-                post.down_votes.remove(request.user)
-            else:
-                post.up_votes.add(request.user)
+            post.upvote(request.user)
 
         elif type == "comment":
             comment = Comment.objects.get(pk=id)
-            print("comment=", comment)
-            comment.rating += 1
-            comment.save()
-            if comment.down_votes.filter(id=request.user.id).exists():
-                comment.down_votes.remove(request.user)
-            else:
-                comment.up_votes.add(request.user)
+            comment.upvote(request.user)
+
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     return HttpResponseForbidden()
 
@@ -313,20 +303,11 @@ def downvote(request, **kwargs):
 
         if type == "post":
             post = Post.objects.get(pk=id)
-            post.rating -= 1
-            post.save()
-            if post.up_votes.filter(id=request.user.id).exists():
-                post.up_votes.remove(request.user)
-            else:
-                post.down_votes.add(request.user)
+            post.downvote(request.user)
 
         elif type == "comment":
             comment = Comment.objects.get(pk=id)
-            comment.rating -= 1
-            comment.save()
-            if comment.up_votes.filter(id=request.user.id).exists():
-                comment.up_votes.remove(request.user)
-            else:
-                comment.down_votes.add(request.user)
+            comment.downvote(request.user)
+
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     return HttpResponseForbidden()
