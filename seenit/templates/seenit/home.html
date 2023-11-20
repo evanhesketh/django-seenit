@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
 {% block title %}Seenit{% endblock %}
-{% block nav %} 
-{% include 'navbar.html' with user=request.user %}
+{% block nav %}
+    {% include 'navbar.html' with user=request.user %}
 {% endblock%}
 {% block content %}
-<div>Seenit Homepage</div>
+    <div>Seenit Homepage</div>
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
 {% endblock %}

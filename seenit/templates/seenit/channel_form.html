@@ -3,12 +3,12 @@
 {% block title %}Create a channel{% endblock %}
 
 {% block content %}
-<div>Create a new channel</div>
+  <div>Create a new channel</div>
 
-<form action="{% url 'seenit:create_channel' %}" method="POST">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <input type="submit" value="Create Channel">
-</form>
+  <form action="{% url 'seenit:create_channel' %}" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Create Channel">
+  </form>
 
 {% endblock %}

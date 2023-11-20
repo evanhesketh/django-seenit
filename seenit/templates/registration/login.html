@@ -3,32 +3,32 @@
 {% load tailwind_filters %}
 
 {% block content %}
-<div class="flex justify-center">
-<div class="w-[300px] mt-20">
-  {% if form.errors %}
-    <p>Your username and password didn't match. Please try again.</p>
-  {% endif %}
+  <div class="flex justify-center">
+    <div class="w-[300px] mt-20">
+      {% if form.errors %}
+        <p>Your username and password didn't match. Please try again.</p>
+      {% endif %}
 
-  {% if next %}
-    {% if user.is_authenticated %}
-      <p>Your account doesn't have access to this page. To proceed,
-      please login with an account that has access.</p>
-    {% else %}
-      <p>Please login to see this page.</p>
-    {% endif %}
-  {% endif %}
+      {% if next %}
+        {% if user.is_authenticated %}
+          <p>Your account doesn't have access to this page. To proceed,
+            please login with an account that has access.</p>
+        {% else %}
+          <p>Please login to see this page.</p>
+        {% endif %}
+      {% endif %}
 
-  <form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <input type="submit" value="Login" class="bg-green-500 px-4 py-2 rounded">
-    <input type="hidden" name="next" value="{{ next }}">
-  </form>
+      <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" value="Login" class="bg-green-500 px-4 py-2 rounded">
+        <input type="hidden" name="next" value="{{ next }}">
+      </form>
 
-  <a href="{% url 'seenit:register' %}" class="text-blue-500 underline">Create an account</a>
+      <a href="{% url 'seenit:register' %}" class="text-blue-500 underline">Create an account</a>
 
   {# Assumes you setup the password_reset view in your URLconf #}
   <!-- <p><a href="{% url 'password_reset' %}">Lost password?</a></p> -->
-</div>
-</div>
+    </div>
+  </div>
 {% endblock %}

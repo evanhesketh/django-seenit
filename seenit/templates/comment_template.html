@@ -3,31 +3,31 @@
 {% load mptt_tags %}
 
 {% recursetree comments %}
-<ul>
-<li>
-  <div class="border border-black my-3 mx-10">
-    <div class="flex">
-      {% include "comment_rating_base.html" with rating=node.rating comment=node post_type='comment' %}
-      <div class="px-4">
-        <p class="text-xs">Posted by <a href="{% url 'seenit:user_detail' pk=node.user.id %}" class="text-blue-500 underline">{{node.user.username}}</a></p>
-        <p>{{ node.text }}</p>
-        <button class="reply-btn bg-green-300 px-2 rounded">Reply</button>
-        <form
-          action="{% url 'seenit:reply' pk=node.id channel_id=post.channel.id post_id=post.id %}"
-          method="POST"
-          style="display: none"
-        >
-          {% csrf_token %} {{ form|crispy }}
-          <button class="bg-green-500 py-2 px-4 rounded">Reply</button>
-        </form>
+  <ul>
+    <li>
+      <div class="border border-black my-3 mx-10">
+        <div class="flex">
+          {% include "comment_rating_base.html" with rating=node.rating comment=node post_type='comment' %}
+          <div class="px-4">
+            <p class="text-xs">Posted by <a href="{% url 'seenit:user_detail' pk=node.user.id %}" class="text-blue-500 underline">{{node.user.username}}</a></p>
+            <p>{{ node.text }}</p>
+            <button class="reply-btn bg-green-300 px-2 rounded">Reply</button>
+            <form
+              action="{% url 'seenit:reply' pk=node.id channel_id=post.channel.id post_id=post.id %}"
+              method="POST"
+              style="display: none"
+            >
+              {% csrf_token %} {{ form|crispy }}
+              <button class="bg-green-500 py-2 px-4 rounded">Reply</button>
+            </form>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-  {% if not node.is_leaf_node %}
-  
-  {{ children }}
-  
-  {% endif %}
-</li>
-</ul>
+      {% if not node.is_leaf_node %}
+
+        {{ children }}
+
+      {% endif %}
+    </li>
+  </ul>
 {% endrecursetree %}

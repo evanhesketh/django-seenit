@@ -1,46 +1,46 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 
-{% load static %} 
+{% load static %}
 
-{% load tailwind_filters %} 
+{% load tailwind_filters %}
 
-{% block title %}{{post.title}}{%endblock %} 
+{% block title %}{{post.title}}{%endblock %}
 
-{% block nav %} 
+{% block nav %}
   {% include 'navbar.html' with user=request.user %}
-{% endblock%} 
+{% endblock%}
 
 {% block content %}
-<div class="flex justify-center">
-  <div class="w-[400px] sm:w-[600px]">
-    <div class="post-container">
-      <div class="border border-black my-3">
-        <div class="flex">
-          {% include "post_rating_base.html" with rating=post.rating post=post post_type='post' %}
-          <div class="px-4">
-            <p class="text-xs">Posted by <a href="{% url 'seenit:user_detail' pk=post.user.id %}" class="text-blue-500 underline">{{post.user.username}}</a></p>
-            <h4 class="text-gray-500 text-lg">{{ post.title }}</h4>
-            <p>{{post.text}}</p>
+  <div class="flex justify-center">
+    <div class="w-[400px] sm:w-[600px]">
+      <div class="post-container">
+        <div class="border border-black my-3">
+          <div class="flex">
+            {% include "post_rating_base.html" with rating=post.rating post=post post_type='post' %}
+            <div class="px-4">
+              <p class="text-xs">Posted by <a href="{% url 'seenit:user_detail' pk=post.user.id %}" class="text-blue-500 underline">{{post.user.username}}</a></p>
+              <h4 class="text-gray-500 text-lg">{{ post.title }}</h4>
+              <p>{{post.text}}</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div>
-      <h3>Comment:</h3>
-      <form
-        action="{% url 'seenit:post_detail' pk=post_id channel_id=post.channel.id %}"
-        method="POST"
-      >
-        {% csrf_token %} {{ form|crispy }}
-        <button class="bg-green-500 py-2 px-4 rounded">Comment</button>
-      </form>
-    </div>
-    <div class="post-container">
-      <ul>
-          {% include "comment_template.html" %} 
-      </ul>
+      <div>
+        <h3>Comment:</h3>
+        <form
+          action="{% url 'seenit:post_detail' pk=post_id channel_id=post.channel.id %}"
+          method="POST"
+        >
+          {% csrf_token %} {{ form|crispy }}
+          <button class="bg-green-500 py-2 px-4 rounded">Comment</button>
+        </form>
+      </div>
+      <div class="post-container">
+        <ul>
+          {% include "comment_template.html" %}
+        </ul>
+      </div>
     </div>
   </div>
-</div>
-<script src="{% static 'app.js' %}"></script>
+  <script src="{% static 'app.js' %}"></script>
 {% endblock %}
