@@ -1,16 +1,16 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/axios/dist/axios.js"></script>
-  <link rel="stylesheet" href="{% static 'app.css' %}">
-  <title>{% block title %}{% endblock %}</title>
-</head>
-{% block nav%}{% endblock %}
-<body>
-  <div id="content">{% block content %}{% endblock %}</div>
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/axios/dist/axios.js"></script>
+    <link rel="stylesheet" href="{% static 'app.css' %}">
+    <title>{% block title %}{% endblock %}</title>
+  </head>
+  {% block nav%}{% endblock %}
+  <body>
+    <div id="content">{% block content %}{% endblock %}</div>
+  </body>
 </html>

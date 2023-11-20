@@ -1,49 +1,49 @@
 {% extends "base.html" %}
 
-{% block nav %} 
+{% block nav %}
   {% include 'navbar.html' with user=request.user %}
 {% endblock%}
 
 {% block content%}
-<div class="flex flex-col items-center">
-<div class="w-[400px] sm:w-[600px]">
-{% if request.user == object %}
-<h1 class="text-xl mt-10">Hello, {{object.username}}</h1>
-<div class="mt-10">
-  {% if object.subscribed_channels.exists %}
-  <p>You are subscribed to:</p>
-  <ul>
-  {% for channel in object.subscribed_channels.all %}
-  <li class="my-3 text-blue-500 underline"><a href="{% url 'seenit:channel_detail' pk=channel.id %}">{{ channel.name }}</a></li>
-  {% endfor %}
-</ul>
-</div>
-<div>
-  <p>Here are some highlights from your channels:</p>
-  <ul>
-  {% for post_group in channel_highlights %}
-    {% for post in post_group %}
-      {% include 'post_template.html' with post=post %}
-    {% endfor %}
-  {% endfor %}
-  {% else%}
-  <p>You are not subscribed to any channels yet. Go explore!</p>
-  {% endif %}
-</ul>
-</div>
-{% endif %}
-{% if request.user != object %}
-<h1 class="text-xl">{{object.username}}</h1>
-{% endif %}
-<div>
-  <p>Top 5 posts by {{object.username}}:</p>
-  <ul>
-    {% for post in top_posts %}
-      {% include 'post_template.html' with post=post %}
-    {% endfor %}
-  </ul>
-</div>
-</div>
-</div>
+  <div class="flex flex-col items-center">
+    <div class="w-[400px] sm:w-[600px]">
+      {% if request.user == object %}
+        <h1 class="text-xl mt-10">Hello, {{object.username}}</h1>
+        <div class="mt-10">
+          {% if object.subscribed_channels.exists %}
+            <p>You are subscribed to:</p>
+            <ul>
+              {% for channel in object.subscribed_channels.all %}
+                <li class="my-3 text-blue-500 underline"><a href="{% url 'seenit:channel_detail' pk=channel.id %}">{{ channel.name }}</a></li>
+              {% endfor %}
+            </ul>
+            </div>
+            <div>
+              <p>Here are some highlights from your channels:</p>
+              <ul>
+                {% for post_group in channel_highlights %}
+                  {% for post in post_group %}
+                    {% include 'post_template.html' with post=post %}
+                  {% endfor %}
+                {% endfor %}
+          {% else%}
+            <p>You are not subscribed to any channels yet. Go explore!</p>
+          {% endif %}
+        </ul>
+        </div>
+      {% endif %}
+      {% if request.user != object %}
+        <h1 class="text-xl">{{object.username}}</h1>
+      {% endif %}
+      <div>
+        <p>Top 5 posts by {{object.username}}:</p>
+        <ul>
+          {% for post in top_posts %}
+            {% include 'post_template.html' with post=post %}
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
 
 {% endblock %}

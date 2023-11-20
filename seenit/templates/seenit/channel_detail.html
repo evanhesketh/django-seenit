@@ -1,62 +1,62 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 
-{% block title %}{{channel.name}}{% endblock %} 
+{% block title %}{{channel.name}}{% endblock %}
 
-{% block nav %} 
+{% block nav %}
   {% include 'navbar.html' with user=request.user %}
 {% endblock%}
 
-{% block content %} 
+{% block content %}
 
-{% load tailwind_filters %}
-{% load static %}
+  {% load tailwind_filters %}
+  {% load static %}
 
-<div class="flex justify-center">
-  <div class="w-1/3">
-    <div class="flex">
-    <h1 class="text-2xl mr-1">{{channel.name}}</h1>
-    <div id="subscribe-btns">
-    {% if user_subscribed %}
-    <form action="{% url 'seenit:unsubscribe' channel_id=channel.id user_id=request.user.id%}" method="POST">
-      {% csrf_token %}
-      <button class="px-2 py-2 bg-green-500 rounded">Unsubscribe</button>
-    </form>
-    {% else %}
-    <form action="{% url 'seenit:subscribe' channel_id=channel.id user_id=request.user.id %}" method="POST">
-      {% csrf_token %}
-      <button class="px-2 py-2 bg-green-500 rounded">Subscribe</button>
-    </form>
-  {% endif %}
-  </div>
-  </div>
-    <div>
-      <h3 class="text-lg">Create a post:</h3>
-      <form
-        action="{% url 'seenit:channel_detail' pk=channel_id %}"
-        method="POST"
-      >
-        {% csrf_token %} {{ form|crispy }}
-        <button class="bg-green-500 py-2 px-4 rounded">Post</button>
-      </form>
-    </div>
-    <div class="post-container">
-    {% for post in channel.posts.all %}
-    <div class="border border-black my-3">
+  <div class="flex justify-center">
+    <div class="w-1/3">
       <div class="flex">
-        {% include "post_rating_base.html" with rating=post.rating post_type="post" post=post %}
-    <a href="{% url 'seenit:post_detail' pk=post.id channel_id=channel_id%}">
-    <div class="px-4">
-      <p class="text-xs">Posted by {{post.user.username}}</p>
-      <h4 class="text-gray-500 text-lg">{{ post.title }}</h4>
+        <h1 class="text-2xl mr-1">{{channel.name}}</h1>
+        <div id="subscribe-btns">
+          {% if user_subscribed %}
+            <form action="{% url 'seenit:unsubscribe' channel_id=channel.id user_id=request.user.id%}" method="POST">
+              {% csrf_token %}
+              <button class="px-2 py-2 bg-green-500 rounded">Unsubscribe</button>
+            </form>
+          {% else %}
+            <form action="{% url 'seenit:subscribe' channel_id=channel.id user_id=request.user.id %}" method="POST">
+              {% csrf_token %}
+              <button class="px-2 py-2 bg-green-500 rounded">Subscribe</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+      <div>
+        <h3 class="text-lg">Create a post:</h3>
+        <form
+          action="{% url 'seenit:channel_detail' pk=channel_id %}"
+          method="POST"
+        >
+          {% csrf_token %} {{ form|crispy }}
+          <button class="bg-green-500 py-2 px-4 rounded">Post</button>
+        </form>
+      </div>
+      <div class="post-container">
+        {% for post in channel.posts.all %}
+          <div class="border border-black my-3">
+            <div class="flex">
+              {% include "post_rating_base.html" with rating=post.rating post_type="post" post=post %}
+              <a href="{% url 'seenit:post_detail' pk=post.id channel_id=channel_id%}">
+                <div class="px-4">
+                  <p class="text-xs">Posted by <a href="{% url 'seenit:user_detail' pk=post.user.id %}" class="text-blue-500 underline">{{post.user.username}}</a></p>
+                  <h4 class="text-gray-500 text-lg">{{ post.title }}</h4>
+                </div>
+              </div>
+            </div>
+          </a>
+
+        {% endfor %}
+      </div>
     </div>
   </div>
-</div>
-</a>
 
-{% endfor %}
-</div>
-</div>
-</div>
-
-<script src="{% static 'app.js' %}"></script>
+  <script src="{% static 'app.js' %}"></script>
 {% endblock %}

@@ -1,9 +1,9 @@
 <nav class="flex justify-evenly my-4">
   <a href="{% url 'seenit:home' %}" class="text-blue-500 underline">Home</a>
   {% if user %}
-  <a href="{% url 'seenit:channels' %}" class="text-blue-500 underline">Channels</a>
-  <a href="{% url 'logout' %}" class="text-blue-500 underline">Logout</a>
+    <a href="{% url 'seenit:channels' %}" class="text-blue-500 underline">Channels</a>
+    <a href="{% url 'logout' %}" class="text-blue-500 underline">Logout</a>
   {% else %}
-  <a href="{% url 'login' %}" class="text-blue-500 underline">Login</a>
+    <a href="{% url 'login' %}" class="text-blue-500 underline">Login</a>
   {% endif %}
 </nav>
