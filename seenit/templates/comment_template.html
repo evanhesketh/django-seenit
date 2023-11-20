@@ -9,7 +9,7 @@
     <div class="flex">
       {% include "comment_rating_base.html" with rating=node.rating comment=node post_type='comment' %}
       <div class="px-4">
-        <p class="text-xs">Posted by {{node.user.username}}</p>
+        <p class="text-xs">Posted by <a href="{% url 'seenit:user_detail' pk=node.user.id %}" class="text-blue-500 underline">{{node.user.username}}</a></p>
         <p>{{ node.text }}</p>
         <button class="reply-btn bg-green-300 px-2 rounded">Reply</button>
         <form
