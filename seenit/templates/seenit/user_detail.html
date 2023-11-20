@@ -36,7 +36,7 @@
 <h1 class="text-xl">{{object.username}}</h1>
 {% endif %}
 <div>
-  <p>Top 5 posts:</p>
+  <p>Top 5 posts by {{object.username}}:</p>
   <ul>
     {% for post in top_posts %}
       {% include 'post_template.html' with post=post %}
