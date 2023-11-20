@@ -28,7 +28,7 @@
     <div>
       <h3>Comment:</h3>
       <form
-        action="{% url 'seenit:post-detail' pk=post_id channel_id=post.channel.id %}"
+        action="{% url 'seenit:post_detail' pk=post_id channel_id=post.channel.id %}"
         method="POST"
       >
         {% csrf_token %} {{ form|crispy }}

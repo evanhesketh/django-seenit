@@ -13,7 +13,7 @@
   <p>You are subscribed to:</p>
   <ul>
   {% for channel in object.subscribed_channels.all %}
-  <li class="my-3 text-blue-500 underline"><a href="{% url 'seenit:channel-detail' pk=channel.id %}">{{ channel.name }}</a></li>
+  <li class="my-3 text-blue-500 underline"><a href="{% url 'seenit:channel_detail' pk=channel.id %}">{{ channel.name }}</a></li>
   {% endfor %}
 </ul>
 </div>
@@ -22,7 +22,7 @@
   <ul>
   {% for post_group in channel_highlights %}
     {% for post in post_group %}
-    <a href="{% url 'seenit:post-detail' pk=post.id channel_id=post.channel.id %}">
+    <a href="{% url 'seenit:post_detail' pk=post.id channel_id=post.channel.id %}">
       {% include 'post_template.html' with post=post %}
     </a>
     {% endfor %}

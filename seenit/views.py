@@ -135,7 +135,7 @@ class ChannelDetailFormView(SingleObjectMixin, FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse("seenit:channel-detail", kwargs={"pk": self.object.pk})
+        return reverse("seenit:channel_detail", kwargs={"pk": self.object.pk})
 
 
 class ChannelView(View):
@@ -161,7 +161,7 @@ def subscribe(request, **kwargs):
         user = get_object_or_404(User, pk=user_id)
         channel = get_object_or_404(Channel, pk=channel_id)
         user.subscribed_channels.add(channel)
-        return HttpResponseRedirect(reverse("seenit:channel-detail",
+        return HttpResponseRedirect(reverse("seenit:channel_detail",
                                             kwargs={"pk": channel_id}))
     return HttpResponseForbidden()
 
@@ -177,7 +177,7 @@ def unsubscribe(request, **kwargs):
         user = get_object_or_404(User, pk=user_id)
         channel = get_object_or_404(Channel, pk=channel_id)
         user.subscribed_channels.remove(channel)
-        return HttpResponseRedirect(reverse("seenit:channel-detail",
+        return HttpResponseRedirect(reverse("seenit:channel_detail",
                                             kwargs={"pk": channel_id}))
     return HttpResponseForbidden()
 
@@ -232,7 +232,7 @@ class PostDetailFormView(SingleObjectMixin, FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse("seenit:post-detail",
+        return reverse("seenit:post_detail",
                        kwargs={"pk": self.object.pk,
                                "channel_id": self.kwargs['channel_id']
                                }
@@ -264,7 +264,7 @@ def handle_reply(request, *args, **kwargs):
     reply.save()
 
     return HttpResponseRedirect(
-        reverse("seenit:post-detail",
+        reverse("seenit:post_detail",
                 kwargs={"pk": kwargs['post_id'],
                         "channel_id": kwargs['channel_id']
                         }

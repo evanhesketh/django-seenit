@@ -32,7 +32,7 @@
     <div>
       <h3 class="text-lg">Create a post:</h3>
       <form
-        action="{% url 'seenit:channel-detail' pk=channel_id %}"
+        action="{% url 'seenit:channel_detail' pk=channel_id %}"
         method="POST"
       >
         {% csrf_token %} {{ form|crispy }}
@@ -44,7 +44,7 @@
     <div class="border border-black my-3">
       <div class="flex">
         {% include "post_rating_base.html" with rating=post.rating post_type="post" post=post %}
-    <a href="{% url 'seenit:post-detail' pk=post.id channel_id=channel_id%}">
+    <a href="{% url 'seenit:post_detail' pk=post.id channel_id=channel_id%}">
     <div class="px-4">
       <p class="text-xs">Posted by {{post.user.username}}</p>
       <h4 class="text-gray-500 text-lg">{{ post.title }}</h4>
