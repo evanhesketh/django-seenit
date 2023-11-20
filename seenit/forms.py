@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, Post, Comment
+from .models import User, Post, Comment, Channel
 
 
 class RegisterForm(UserCreationForm):
@@ -19,3 +19,9 @@ class CommentForm(ModelForm):
     class Meta:
         model = Comment
         fields = ["text"]
+
+
+class ChannelForm(ModelForm):
+    class Meta:
+        model = Channel
+        fields = ['name']

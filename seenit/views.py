@@ -6,11 +6,10 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views import View
-from django.views.generic.edit import CreateView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic import ListView, DetailView, FormView
 
-from .forms import RegisterForm, PostForm, CommentForm
+from .forms import RegisterForm, PostForm, CommentForm, ChannelForm
 from .models import User, Channel, Post, Comment
 
 ###############################################################################
@@ -68,18 +67,17 @@ class UserDetailView(DetailView):
 # Channel views
 
 
-class ChannelCreateView(CreateView):
-    """Form for creating a new channel.
+def create_channel(request):
+    """Handle creating a new channel
     If successful, redirect to homepage
-    Otherwise, present form
     """
 
-    model = Channel
-    fields = ["name"]
-    template_name = 'seenit/channel_form.html'
-
-    def get_success_url(self):
-        return reverse('seenit:home')
+    if request.method == "POST":
+        form = ChannelForm(request.POST)
+        if form.is_valid():
+            form.save()
+        return HttpResponseRedirect(reverse('seenit:channels'))
+    return HttpResponseForbidden()
 
 
 class ChannelListView(ListView):
@@ -87,6 +85,11 @@ class ChannelListView(ListView):
 
     template_name = 'seenit/channel_list.html'
     context_object_name = 'channel_list'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = ChannelForm()
+        return context
 
     def get_queryset(self):
         return Channel.objects.all()

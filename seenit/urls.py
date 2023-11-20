@@ -12,7 +12,7 @@ urlpatterns = [
     path("users/<int:pk>/", login_required(views.UserDetailView.as_view()),
          name="user_detail"),
     path("create_channel/",
-         login_required(views.ChannelCreateView.as_view()),
+         login_required(views.create_channel),
          name="create_channel"),
     path("channels/", login_required(
         views.ChannelListView.as_view()), name="channels"),

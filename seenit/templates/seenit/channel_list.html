@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load tailwind_filters %}
+
 {% block title %}Channels{% endblock %}
 
 {% block nav %}
@@ -8,7 +10,17 @@
 
 {% block content %}
   <div class="flex flex-col items-center">
-    <h1 class="text-lg my-4">Channels</h1>
+    <p>Create a new channel:</p>
+    <form
+          action="{% url 'seenit:create_channel' %}"
+          method="POST"
+        >
+          {% csrf_token %} 
+          
+          {{ form|crispy }}
+          <button class="bg-green-500 py-2 px-4 rounded">Create</button>
+        </form>
+    <h1 class="text-xl my-4">Channels</h1>
 
     <ul>
       {% for channel in channel_list %}
