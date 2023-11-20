@@ -18,7 +18,7 @@
         <div class="flex">
           {% include "post_rating_base.html" with rating=post.rating post=post post_type='post' %}
           <div class="px-4">
-            <p class="text-xs">Posted by {{post.user.username}}</p>
+            <p class="text-xs">Posted by <a href="{% url 'seenit:user_detail' pk=post.user.id %}" class="text-blue-500 underline">{{post.user.username}}</a></p>
             <h4 class="text-gray-500 text-lg">{{ post.title }}</h4>
             <p>{{post.text}}</p>
           </div>
