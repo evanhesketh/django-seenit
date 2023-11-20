@@ -44,14 +44,14 @@
           <div class="border border-black my-3">
             <div class="flex">
               {% include "post_rating_base.html" with rating=post.rating post_type="post" post=post %}
-              <a href="{% url 'seenit:post_detail' pk=post.id channel_id=channel_id%}">
-                <div class="px-4">
-                  <p class="text-xs">Posted by <a href="{% url 'seenit:user_detail' pk=post.user.id %}" class="text-blue-500 underline">{{post.user.username}}</a></p>
+              <div class="px-4">
+                <p class="text-xs">Posted by <a href="{% url 'seenit:user_detail' pk=post.user.id %}" class="text-blue-500 underline">{{post.user.username}}</a></p>
+                <a href="{% url 'seenit:post_detail' pk=post.id channel_id=channel_id%}">
                   <h4 class="text-gray-500 text-lg">{{ post.title }}</h4>
+                </a>
                 </div>
               </div>
             </div>
-          </a>
 
         {% endfor %}
       </div>
