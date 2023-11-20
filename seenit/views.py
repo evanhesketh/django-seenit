@@ -59,10 +59,9 @@ class UserDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         subscribed_channels = self.object.subscribed_channels.all()
-        print("subscribed_channels=", subscribed_channels)
         context['channel_highlights'] = [channel.posts.all()[:2]
                                          for channel in subscribed_channels]
-        print("context=", context)
+        context['top_posts'] = self.object.get_top_posts()
         return context
 
 ###############################################################################

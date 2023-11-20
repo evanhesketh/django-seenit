@@ -14,11 +14,17 @@ class User(AbstractUser):
     # related names:
 
     # posts
+    # comments
     # subscribed_channels
     # comment_up_votes
     # comment_down_votes
     # post_up_votes
     # post_down_votes
+
+    def get_top_posts(self):
+        """Get the top 5 posts for a user"""
+
+        return self.posts.all()[:5]
 
 
 class Channel(models.Model):
