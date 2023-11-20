@@ -1,7 +1,4 @@
-import json
-
-from django.http import (HttpResponseForbidden, HttpResponseNotFound,
-                         JsonResponse)
+from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import (render, redirect, HttpResponseRedirect,
                               get_object_or_404)
 from django.urls import reverse
@@ -12,19 +9,33 @@ from django.views import View
 from django.views.generic.edit import CreateView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic import ListView, DetailView, FormView
-from django.views.decorators.csrf import csrf_exempt
 
 from .forms import RegisterForm, PostForm, CommentForm
 from .models import User, Channel, Post, Comment
 
+###############################################################################
+# Homepage
+
 
 @login_required()
 def home(request):
+    """Logged-in: redirect to user detail page
+    Logged-out: redirect to login page
+    """
+
     return redirect(reverse('seenit:user_detail',
                             kwargs={"pk": request.user.id}))
 
+###############################################################################
+# User views
+
 
 def register_user(request):
+    """Handle user signup.
+    If form valid, create new user, add to db and redirect to homepage
+    Otherwise, present signup form
+    """
+
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -41,6 +52,8 @@ def register_user(request):
 
 
 class UserDetailView(DetailView):
+    """Show user details page"""
+
     model = User
 
     def get_context_data(self, **kwargs):
@@ -52,8 +65,16 @@ class UserDetailView(DetailView):
         print("context=", context)
         return context
 
+###############################################################################
+# Channel views
+
 
 class ChannelCreateView(CreateView):
+    """Form for creating a new channel.
+    If successful, redirect to homepage
+    Otherwise, present form
+    """
+
     model = Channel
     fields = ["name"]
     template_name = 'seenit/channel_form.html'
@@ -63,6 +84,8 @@ class ChannelCreateView(CreateView):
 
 
 class ChannelListView(ListView):
+    """Display a list of all channels"""
+
     template_name = 'seenit/channel_list.html'
     context_object_name = 'channel_list'
 
@@ -71,6 +94,8 @@ class ChannelListView(ListView):
 
 
 class ChannelDetailView(DetailView):
+    """Display a channel and associated posts"""
+
     model = Channel
 
     def get_context_data(self, **kwargs):
@@ -79,12 +104,17 @@ class ChannelDetailView(DetailView):
         context['form'] = PostForm()
         user_subscribed = self.object.determine_if_user_subscribed(
             self.request.user)
-        
+
         context['user_subscribed'] = user_subscribed
         return context
 
 
 class ChannelDetailFormView(SingleObjectMixin, FormView):
+    """Handle adding a new post to a channel.
+    If form is valid, create a new post and add to db
+    Otherwise, present form
+    """
+
     template_name = 'seenit/channel_detail.html'
     form_class = PostForm
     model = Channel
@@ -109,6 +139,8 @@ class ChannelDetailFormView(SingleObjectMixin, FormView):
 
 
 class ChannelView(View):
+    """Handle routing for GET and POST requests to channel detail view"""
+
     def get(self, request, *args, **kwargs):
         view = ChannelDetailView.as_view()
         return view(request, *args, **kwargs)
@@ -118,7 +150,44 @@ class ChannelView(View):
         return view(request, *args, **kwargs)
 
 
+def subscribe(request, **kwargs):
+    """Handle subscribing to a channel.
+    Redirect to channel detail page
+    """
+
+    if request.method == "POST":
+        channel_id = kwargs['channel_id']
+        user_id = kwargs['user_id']
+        user = get_object_or_404(User, pk=user_id)
+        channel = get_object_or_404(Channel, pk=channel_id)
+        user.subscribed_channels.add(channel)
+        return HttpResponseRedirect(reverse("seenit:channel-detail",
+                                            kwargs={"pk": channel_id}))
+    return HttpResponseForbidden()
+
+
+def unsubscribe(request, **kwargs):
+    """Handle unsubscribing to a channel.
+    Redirect to channel detail page
+    """
+
+    if request.method == "POST":
+        channel_id = kwargs['channel_id']
+        user_id = kwargs['user_id']
+        user = get_object_or_404(User, pk=user_id)
+        channel = get_object_or_404(Channel, pk=channel_id)
+        user.subscribed_channels.remove(channel)
+        return HttpResponseRedirect(reverse("seenit:channel-detail",
+                                            kwargs={"pk": channel_id}))
+    return HttpResponseForbidden()
+
+###############################################################################
+# Post/comment views
+
+
 class PostDetailView(DetailView):
+    """Display a post and associated comment threads"""
+
     model = Post
 
     def get(self, request, *args, **kwargs):
@@ -139,6 +208,11 @@ class PostDetailView(DetailView):
 
 
 class PostDetailFormView(SingleObjectMixin, FormView):
+    """Handle adding a new comment to a post
+    If form is valid, create comment and add to db
+    Otherwise, present form
+    """
+
     template_name = 'seenit/post_detail.html'
     form_class = CommentForm
     model = Post
@@ -166,6 +240,8 @@ class PostDetailFormView(SingleObjectMixin, FormView):
 
 
 class PostView(View):
+    """Handle routing for GET and POST requests to post detail view"""
+
     def get(self, request, *args, **kwargs):
         view = PostDetailView.as_view()
         return view(request, *args, **kwargs)
@@ -176,6 +252,10 @@ class PostView(View):
 
 
 def handle_reply(request, *args, **kwargs):
+    """Handle reply to a comment.
+    Create reply and add to db
+    """
+
     text = request.POST.get('text')
     user = User.objects.get(pk=request.user.pk)
     post = Post.objects.get(pk=kwargs['post_id'])
@@ -192,6 +272,10 @@ def handle_reply(request, *args, **kwargs):
 
 
 def upvote(request, **kwargs):
+    """Handle upvote for a post or comment.
+    Redirect to same page
+    """
+
     if request.method == "POST":
         id = kwargs['pk']
         type = kwargs['post_type']
@@ -219,6 +303,10 @@ def upvote(request, **kwargs):
 
 
 def downvote(request, **kwargs):
+    """Handle downvote for a post or comment.
+    Redirect to same page
+    """
+
     if request.method == "POST":
         id = kwargs['pk']
         type = kwargs['post_type']
@@ -241,28 +329,4 @@ def downvote(request, **kwargs):
             else:
                 comment.down_votes.add(request.user)
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
-    return HttpResponseForbidden()
-
-
-def subscribe(request, **kwargs):
-    if request.method == "POST":
-        channel_id = kwargs['channel_id']
-        user_id = kwargs['user_id']
-        user = get_object_or_404(User, pk=user_id)
-        channel = get_object_or_404(Channel, pk=channel_id)
-        user.subscribed_channels.add(channel)
-        return HttpResponseRedirect(reverse("seenit:channel-detail",
-                                            kwargs={"pk": channel_id}))
-    return HttpResponseForbidden()
-
-
-def unsubscribe(request, **kwargs):
-    if request.method == "POST":
-        channel_id = kwargs['channel_id']
-        user_id = kwargs['user_id']
-        user = get_object_or_404(User, pk=user_id)
-        channel = get_object_or_404(Channel, pk=channel_id)
-        user.subscribed_channels.remove(channel)
-        return HttpResponseRedirect(reverse("seenit:channel-detail",
-                                            kwargs={"pk": channel_id}))
     return HttpResponseForbidden()
