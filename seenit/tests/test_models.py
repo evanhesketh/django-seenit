@@ -44,19 +44,35 @@ class UserModelTests(ModelsTestCase):
         self.assertEqual(len(user), 1)
 
     def test_user_top_posts(self):
-        user = User.objects.filter(id=self.u1_id)
-        post = Post.objects.filter(id=self.p1_id)
-        channel = Channel.objects.filter(id=self.c1_id)
+        user = User.objects.get(id=self.u1_id)
+        post = Post.objects.get(id=self.p1_id)
+        channel = Channel.objects.get(id=self.c1_id)
 
-        posts = user[0].get_top_posts()
+        posts = user.get_top_posts()
 
         self.assertEqual(len(posts), 2)
-        self.assertIn(post[0], posts)
+        self.assertIn(post, posts)
 
-        p3 = Post(title="post3", text="abcabc", user=user[0],
-                  channel=channel[0])
+        p3 = Post(title="post3", text="abcabc", user=user,
+                  channel=channel)
         p3.save()
 
-        posts = user[0].get_top_posts()
+        posts = user.get_top_posts()
         self.assertEqual(len(posts), 3)
         self.assertIn(p3, posts)
+
+
+class ChannelModelTests(ModelsTestCase):
+    def test_channel_model(self):
+        channel = Channel.objects.filter(id=self.c1_id)
+        self.assertEqual(len(channel), 1)
+
+    def test_determine_if_user_subscribed(self):
+        channel = Channel.objects.get(id=self.c1_id)
+        user = User.objects.get(id=self.u1_id)
+
+        self.assertFalse(channel.determine_if_user_subscribed(user))
+
+        channel.subscribed_users.add(user)
+
+        self.assertTrue(channel.determine_if_user_subscribed(user))
