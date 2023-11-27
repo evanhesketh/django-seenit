@@ -76,3 +76,23 @@ class ChannelModelTests(ModelsTestCase):
         channel.subscribed_users.add(user)
 
         self.assertTrue(channel.determine_if_user_subscribed(user))
+
+
+class PostModelTests(ModelsTestCase):
+    def test_post_model(self):
+        post = Post.objects.filter(id=self.p1_id)
+        self.assertEqual(len(post), 1)
+
+    def test_post_upvote_neutral(self):
+        post = Post.objects.get(id=self.p1_id)
+
+        self.assertEqual(post.rating, 0)
+        self.assertFalse(post.up_votes.exists())
+
+        user = User.objects.get(id=self.u1_id)
+        post.upvote(user)
+
+        user_who_up_voted = post.up_votes.get(id=self.u1_id)
+
+        self.assertEqual(post.rating, 1)
+        self.assertEqual(user, user_who_up_voted)
