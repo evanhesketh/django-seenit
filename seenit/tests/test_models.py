@@ -3,7 +3,7 @@ from django.test import TestCase
 
 sys.path.append('../seenit')
 
-from seenit.models import User, Post, Channel
+from seenit.models import User, Post, Channel, Comment
 
 
 class ModelsTestCase(TestCase):
@@ -32,10 +32,16 @@ class ModelsTestCase(TestCase):
         self.p1_id = p1.id
         self.p2_id = p2.id
 
+        cm1 = Comment(text="comment1", post=p1, user=u1)
+        cm1.save()
+
+        self.cm1_id = cm1.id
+
     def tearDown(self):
-        User.objects.all().delete()
-        Channel.objects.all().delete()
+        Comment.objects.all().delete()
         Post.objects.all().delete()
+        Channel.objects.all().delete()
+        User.objects.all().delete()
 
 
 class UserModelTests(ModelsTestCase):
@@ -142,3 +148,84 @@ class PostModelTests(ModelsTestCase):
         self.assertEqual(post.rating, 0)
         self.assertFalse(post.down_votes.exists())
         self.assertFalse(post.up_votes.exists())
+
+
+class CommentModelTests(ModelsTestCase):
+    def test_comment_model(self):
+        comment = Comment.objects.filter(id=self.cm1_id)
+        self.assertEqual(len(comment), 1)
+
+    def test_comment_on_comment(self):
+        cm1 = Comment.objects.get(id=self.cm1_id)
+        post = Post.objects.get(id=self.p1_id)
+        user = User.objects.get(id=self.u1_id)
+        new_comment = Comment(text="reply to cm1", parent=cm1, post=post,
+                              user=user)
+        new_comment.save()
+
+        self.assertTrue(new_comment.parent == cm1)
+        self.assertTrue(cm1.children.exists())
+
+        reply_to_cm1 = cm1.children.get(id=new_comment.id)
+
+        self.assertEqual(reply_to_cm1.text, "reply to cm1")
+
+    def test_comment_upvote_neutral(self):
+        comment = Comment.objects.get(id=self.cm1_id)
+
+        self.assertEqual(comment.rating, 0)
+        self.assertFalse(comment.up_votes.exists())
+
+        user = User.objects.get(id=self.u1_id)
+        comment.upvote(user)
+
+        user_who_up_voted = comment.up_votes.get(id=self.u1_id)
+
+        self.assertEqual(comment.rating, 1)
+        self.assertEqual(user, user_who_up_voted)
+
+    def test_comment_upvote_from_downvote(self):
+        comment = Comment.objects.get(id=self.cm1_id)
+        user = User.objects.get(id=self.u1_id)
+        comment.down_votes.add(user)
+        comment.rating = -1
+
+        self.assertEqual(comment.rating, -1)
+        self.assertTrue(comment.down_votes.exists())
+        self.assertFalse(comment.up_votes.exists())
+
+        comment.upvote(user)
+
+        self.assertEqual(comment.rating, 0)
+        self.assertFalse(comment.down_votes.exists())
+        self.assertFalse(comment.up_votes.exists())
+
+    def test_comment_downvote_netural(self):
+        comment = Comment.objects.get(id=self.cm1_id)
+
+        self.assertEqual(comment.rating, 0)
+        self.assertFalse(comment.down_votes.exists())
+
+        user = User.objects.get(id=self.u1_id)
+        comment.downvote(user)
+
+        user_who_down_voted = comment.down_votes.get(id=self.u1_id)
+
+        self.assertEqual(comment.rating, -1)
+        self.assertEqual(user, user_who_down_voted)
+
+    def test_comment_downvote_from_upvote(self):
+        comment = Comment.objects.get(id=self.cm1_id)
+        user = User.objects.get(id=self.u1_id)
+        comment.up_votes.add(user)
+        comment.rating = 1
+
+        self.assertEqual(comment.rating, 1)
+        self.assertFalse(comment.down_votes.exists())
+        self.assertTrue(comment.up_votes.exists())
+
+        comment.downvote(user)
+
+        self.assertEqual(comment.rating, 0)
+        self.assertFalse(comment.down_votes.exists())
+        self.assertFalse(comment.up_votes.exists())
