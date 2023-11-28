@@ -1,7 +1,7 @@
 import sys
-sys.path.append('../seenit')
-
 from django.test import TestCase
+
+sys.path.append('../seenit')
 
 from seenit.models import User, Post, Channel
 
@@ -96,3 +96,49 @@ class PostModelTests(ModelsTestCase):
 
         self.assertEqual(post.rating, 1)
         self.assertEqual(user, user_who_up_voted)
+
+    def test_post_upvote_from_downvote(self):
+        post = Post.objects.get(id=self.p1_id)
+        user = User.objects.get(id=self.u1_id)
+        post.down_votes.add(user)
+        post.rating = -1
+
+        self.assertEqual(post.rating, -1)
+        self.assertTrue(post.down_votes.exists())
+        self.assertFalse(post.up_votes.exists())
+
+        post.upvote(user)
+
+        self.assertEqual(post.rating, 0)
+        self.assertFalse(post.down_votes.exists())
+        self.assertFalse(post.up_votes.exists())
+
+    def test_post_downvote_netural(self):
+        post = Post.objects.get(id=self.p1_id)
+
+        self.assertEqual(post.rating, 0)
+        self.assertFalse(post.down_votes.exists())
+
+        user = User.objects.get(id=self.u1_id)
+        post.downvote(user)
+
+        user_who_down_voted = post.down_votes.get(id=self.u1_id)
+
+        self.assertEqual(post.rating, -1)
+        self.assertEqual(user, user_who_down_voted)
+
+    def test_post_downvote_from_upvote(self):
+        post = Post.objects.get(id=self.p1_id)
+        user = User.objects.get(id=self.u1_id)
+        post.up_votes.add(user)
+        post.rating = 1
+
+        self.assertEqual(post.rating, 1)
+        self.assertFalse(post.down_votes.exists())
+        self.assertTrue(post.up_votes.exists())
+
+        post.downvote(user)
+
+        self.assertEqual(post.rating, 0)
+        self.assertFalse(post.down_votes.exists())
+        self.assertFalse(post.up_votes.exists())
