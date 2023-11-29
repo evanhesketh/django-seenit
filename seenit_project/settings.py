@@ -145,7 +145,7 @@ CRISPY_TEMPLATE_PACK = "tailwind"
 # Redirect to home page after login
 LOGIN_REDIRECT_URL = 'seenit:home'
 
-LOGIN_URL = 'accounts/login/'
+LOGIN_URL = '/accounts/login/'
 
 # Log to console
 
