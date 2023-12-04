@@ -69,7 +69,7 @@ class UserDetailView(DetailView):
 
 def create_channel(request):
     """Handle creating a new channel
-    If successful, redirect to homepage
+    If successful, redirect to channel list
     """
 
     if request.method == "POST":

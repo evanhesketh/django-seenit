@@ -87,3 +87,25 @@ class UserDetailViewTests(ViewsTestCase):
         self.assertEqual(response.context['channel_highlights'], [])
         self.assertQuerySetEqual(response.context['top_posts'], [])
         self.assertEqual(response.context['object'], user)
+
+
+class ChannelCreateViewTests(ViewsTestCase):
+    def test_call_view_logged_out(self):
+        response = self.client.post(
+            reverse("seenit:create_channel"))
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get(reverse("seenit:home"), follow=True)
+        self.assertTemplateUsed(response, 'registration/login.html')
+
+    def test_call_view_post_request_logged_in(self):
+        self.client.login(username="test", password="secret")
+        response = self.client.post(reverse("seenit:create_channel"), data={
+                                    "name": "test channel"}, follow=True)
+
+        self.assertContains(response, "test channel")
+
+    def test_call_view_get_request_logged_in(self):
+        self.client.login(username="test", password="secret")
+        response = self.client.get(reverse("seenit:create_channel"))
+        self.assertEqual(response.status_code, 403)
