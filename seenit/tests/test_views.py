@@ -1,5 +1,5 @@
 from seenit.models import User, Channel
-from seenit.forms import ChannelForm
+from seenit.forms import ChannelForm, PostForm
 
 from django.test import TestCase
 from django.urls import reverse
@@ -131,6 +131,7 @@ class ChannelListViewTests(ViewsTestCase):
         response = self.client.get(
             reverse("seenit:channels"), follow=True)
         self.assertContains(response, "test channel")
+        self.assertTemplateUsed(response, "seenit/channel_list.html")
 
     def test_logged_in_context_data(self):
         self.client.login(username="test", password="secret")
@@ -140,3 +141,31 @@ class ChannelListViewTests(ViewsTestCase):
 
         self.assertIsInstance(response.context['form'], ChannelForm)
         self.assertQuerySetEqual(response.context['channel_list'], channels)
+
+
+class ChannelDetailView(ViewsTestCase):
+    def test_call_view_logged_out(self):
+        response = self.client.get(
+            reverse("seenit:channel_detail", kwargs={'pk': 1}))
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get(
+            reverse("seenit:channel_detail", kwargs={'pk': 1}), follow=True)
+        self.assertTemplateUsed(response, 'registration/login.html')
+
+    def test_call_view_logged_in_success(self):
+        self.client.login(username="test", password="secret")
+        response = self.client.get(
+            reverse("seenit:channel_detail", kwargs={'pk': self.channel_id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "test channel")
+        self.assertTemplateUsed(response, 'seenit/channel_detail.html')
+
+    def test_logged_in_context_data(self):
+        self.client.login(username="test", password="secret")
+        response = self.client.get(
+            reverse("seenit:channel_detail", kwargs={'pk': self.channel_id}))
+
+        self.assertEqual(response.context['channel_id'], self.channel_id)
+        self.assertIsInstance(response.context['form'], PostForm)
+        self.assertEqual(response.context['user_subscribed'], False)
