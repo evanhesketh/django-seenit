@@ -1,4 +1,5 @@
-from seenit.models import User
+from seenit.models import User, Channel
+from seenit.forms import ChannelForm
 
 from django.test import TestCase
 from django.urls import reverse
@@ -10,6 +11,11 @@ class ViewsTestCase(TestCase):
         user.save()
 
         self.user_id = user.id
+
+        channel = Channel(name="test channel")
+        channel.save()
+
+        self.channel_id = channel.id
 
 
 class HomeViewTests(ViewsTestCase):
@@ -101,11 +107,36 @@ class ChannelCreateViewTests(ViewsTestCase):
     def test_call_view_post_request_logged_in(self):
         self.client.login(username="test", password="secret")
         response = self.client.post(reverse("seenit:create_channel"), data={
-                                    "name": "test channel"}, follow=True)
+                                    "name": "new test channel"}, follow=True)
 
-        self.assertContains(response, "test channel")
+        self.assertContains(response, "new test channel")
 
     def test_call_view_get_request_logged_in(self):
         self.client.login(username="test", password="secret")
         response = self.client.get(reverse("seenit:create_channel"))
         self.assertEqual(response.status_code, 403)
+
+
+class ChannelListViewTests(ViewsTestCase):
+    def test_call_view_logged_out(self):
+        response = self.client.get(
+            reverse("seenit:channels"))
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get(reverse("seenit:home"), follow=True)
+        self.assertTemplateUsed(response, 'registration/login.html')
+
+    def test_call_view_logged_in(self):
+        self.client.login(username="test", password="secret")
+        response = self.client.get(
+            reverse("seenit:channels"), follow=True)
+        self.assertContains(response, "test channel")
+
+    def test_logged_in_context_data(self):
+        self.client.login(username="test", password="secret")
+        response = self.client.get(
+            reverse("seenit:channels"), follow=True)
+        channels = Channel.objects.all()
+
+        self.assertIsInstance(response.context['form'], ChannelForm)
+        self.assertQuerySetEqual(response.context['channel_list'], channels)
