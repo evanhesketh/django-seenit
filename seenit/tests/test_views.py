@@ -173,12 +173,15 @@ class ChannelDetailViewTests(ViewsTestCase):
 
 class ChannelDetailFormViewTests(ViewsTestCase):
     def test_call_view_logged_out(self):
-        response = self.client.get(
-            reverse("seenit:channel_detail", kwargs={'pk': 1}))
+        response = self.client.post(
+            reverse("seenit:channel_detail", kwargs={'pk': 1}),
+            data={"title": "new post title", "text": "new post text"})
         self.assertEqual(response.status_code, 302)
 
-        response = self.client.get(
-            reverse("seenit:channel_detail", kwargs={'pk': 1}), follow=True)
+        response = self.client.post(
+            reverse("seenit:channel_detail", kwargs={'pk': 1}),
+            data={"title": "new post title", "text": "new post text"},
+            follow=True)
         self.assertTemplateUsed(response, 'registration/login.html')
 
     def test_call_view_logged_in_success(self):
@@ -190,3 +193,32 @@ class ChannelDetailFormViewTests(ViewsTestCase):
 
         self.assertTemplateUsed(response, 'seenit/channel_detail.html')
         self.assertContains(response, "new post title")
+
+
+class SubscribeViewTests(ViewsTestCase):
+    def test_call_view_logged_out(self):
+        response = self.client.post(
+            reverse("seenit:subscribe", kwargs={'user_id': self.user_id,
+                                                'channel_id': self.channel_id}))
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.post(
+            reverse("seenit:subscribe", kwargs={
+                    'user_id': self.user_id, 'channel_id': self.channel_id}),
+            follow=True)
+        self.assertTemplateUsed(response, 'registration/login.html')
+
+    def test_call_view_logged_in_success(self):
+        user = User.objects.get(pk=self.user_id)
+        channel = Channel.objects.get(pk=self.channel_id)
+
+        self.assertNotIn(channel, user.subscribed_channels.all())
+
+        self.client.login(username="test", password="secret")
+        response = self.client.post(
+            reverse("seenit:subscribe", kwargs={'user_id': self.user_id,
+                                                'channel_id': self.channel_id}),
+            follow=True)
+
+        self.assertIn(channel, user.subscribed_channels.all())
+        self.assertTemplateUsed(response, 'seenit/channel_detail.html')
