@@ -143,7 +143,7 @@ class ChannelListViewTests(ViewsTestCase):
         self.assertQuerySetEqual(response.context['channel_list'], channels)
 
 
-class ChannelDetailView(ViewsTestCase):
+class ChannelDetailViewTests(ViewsTestCase):
     def test_call_view_logged_out(self):
         response = self.client.get(
             reverse("seenit:channel_detail", kwargs={'pk': 1}))
@@ -169,3 +169,24 @@ class ChannelDetailView(ViewsTestCase):
         self.assertEqual(response.context['channel_id'], self.channel_id)
         self.assertIsInstance(response.context['form'], PostForm)
         self.assertEqual(response.context['user_subscribed'], False)
+
+
+class ChannelDetailFormViewTests(ViewsTestCase):
+    def test_call_view_logged_out(self):
+        response = self.client.get(
+            reverse("seenit:channel_detail", kwargs={'pk': 1}))
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get(
+            reverse("seenit:channel_detail", kwargs={'pk': 1}), follow=True)
+        self.assertTemplateUsed(response, 'registration/login.html')
+
+    def test_call_view_logged_in_success(self):
+        self.client.login(username="test", password="secret")
+        response = self.client.post(
+            reverse("seenit:channel_detail", kwargs={"pk": self.channel_id}),
+            data={"title": "new post title", "text": "new post text"},
+            follow=True)
+
+        self.assertTemplateUsed(response, 'seenit/channel_detail.html')
+        self.assertContains(response, "new post title")
