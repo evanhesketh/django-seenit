@@ -198,8 +198,9 @@ class ChannelDetailFormViewTests(ViewsTestCase):
 class SubscribeViewTests(ViewsTestCase):
     def test_call_view_logged_out(self):
         response = self.client.post(
-            reverse("seenit:subscribe", kwargs={'user_id': self.user_id,
-                                                'channel_id': self.channel_id}))
+            reverse("seenit:subscribe",
+                    kwargs={'user_id': self.user_id,
+                            'channel_id': self.channel_id}))
         self.assertEqual(response.status_code, 302)
 
         response = self.client.post(
@@ -209,16 +210,51 @@ class SubscribeViewTests(ViewsTestCase):
         self.assertTemplateUsed(response, 'registration/login.html')
 
     def test_call_view_logged_in_success(self):
+        self.client.login(username="test", password="secret")
+
         user = User.objects.get(pk=self.user_id)
         channel = Channel.objects.get(pk=self.channel_id)
 
         self.assertNotIn(channel, user.subscribed_channels.all())
 
-        self.client.login(username="test", password="secret")
         response = self.client.post(
-            reverse("seenit:subscribe", kwargs={'user_id': self.user_id,
-                                                'channel_id': self.channel_id}),
+            reverse("seenit:subscribe",
+                    kwargs={'user_id': self.user_id,
+                            'channel_id': self.channel_id}),
             follow=True)
 
         self.assertIn(channel, user.subscribed_channels.all())
+        self.assertTemplateUsed(response, 'seenit/channel_detail.html')
+
+
+class UnsubscribeViewTests(ViewsTestCase):
+    def test_call_view_logged_out(self):
+        response = self.client.post(
+            reverse("seenit:unsubscribe",
+                    kwargs={'user_id': self.user_id,
+                            'channel_id': self.channel_id}))
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.post(
+            reverse("seenit:unsubscribe", kwargs={
+                    'user_id': self.user_id, 'channel_id': self.channel_id}),
+            follow=True)
+        self.assertTemplateUsed(response, 'registration/login.html')
+
+    def test_call_view_logged_in_success(self):
+        self.client.login(username="test", password="secret")
+
+        user = User.objects.get(pk=self.user_id)
+        channel = Channel.objects.get(pk=self.channel_id)
+        user.subscribed_channels.add(channel)
+
+        self.assertIn(channel, user.subscribed_channels.all())
+
+        response = self.client.post(
+            reverse("seenit:unsubscribe",
+                    kwargs={'user_id': self.user_id,
+                            'channel_id': self.channel_id}),
+            follow=True)
+
+        self.assertNotIn(channel, user.subscribed_channels.all())
         self.assertTemplateUsed(response, 'seenit/channel_detail.html')
