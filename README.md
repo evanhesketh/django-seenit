@@ -46,3 +46,8 @@ Reddit style message board with users, channels, posts, and comments.
    python manage.py runserver
    ```
 9. Got to http://localhost:8000
+
+10. To run tests: In seenit directory
+    ```
+    python manage.py test seenit.tests
+    ``` 
