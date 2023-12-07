@@ -1,5 +1,5 @@
-from seenit.models import User, Channel
-from seenit.forms import ChannelForm, PostForm
+from seenit.models import User, Channel, Post, Comment
+from seenit.forms import ChannelForm, PostForm, CommentForm
 
 from django.test import TestCase
 from django.urls import reverse
@@ -16,6 +16,12 @@ class ViewsTestCase(TestCase):
         channel.save()
 
         self.channel_id = channel.id
+
+        post = Post(title="post title", text="post text",
+                    channel=channel, user=user)
+        post.save()
+
+        self.post_id = post.id
 
 
 class HomeViewTests(ViewsTestCase):
@@ -89,9 +95,10 @@ class UserDetailViewTests(ViewsTestCase):
             reverse("seenit:user_detail", kwargs={'pk': self.user_id}))
 
         user = User.objects.get(id=self.user_id)
+        post = Post.objects.get(id=self.post_id)
 
         self.assertEqual(response.context['channel_highlights'], [])
-        self.assertQuerySetEqual(response.context['top_posts'], [])
+        self.assertQuerySetEqual(response.context['top_posts'], [post])
         self.assertEqual(response.context['object'], user)
 
 
@@ -258,3 +265,41 @@ class UnsubscribeViewTests(ViewsTestCase):
 
         self.assertNotIn(channel, user.subscribed_channels.all())
         self.assertTemplateUsed(response, 'seenit/channel_detail.html')
+
+
+class PostDetailViewTests(ViewsTestCase):
+    def test_call_view_logged_out(self):
+        response = self.client.get(
+            reverse("seenit:post_detail", kwargs={'channel_id': 1, 'pk': 1}))
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get(
+            reverse("seenit:post_detail",
+                    kwargs={
+                        'channel_id': 1, 'pk': 1}),
+            follow=True)
+        self.assertTemplateUsed(response, 'registration/login.html')
+
+    def test_call_view_logged_in_success(self):
+        self.client.login(username="test", password="secret")
+        response = self.client.get(
+            reverse("seenit:post_detail",
+                    kwargs={'channel_id': self.channel_id,
+                            'pk': self.post_id}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "post title")
+        self.assertTemplateUsed(response, 'seenit/post_detail.html')
+
+    def test_logged_in_context_data(self):
+        self.client.login(username="test", password="secret")
+        response = self.client.get(
+            reverse("seenit:post_detail",
+                    kwargs={'channel_id': self.channel_id,
+                            'pk': self.post_id}))
+        post = Post.objects.get(pk=self.post_id)
+        comments = Comment.objects.filter(post=post)
+
+        self.assertEqual(response.context['post_id'], self.post_id)
+        self.assertIsInstance(response.context['form'], CommentForm)
+        self.assertQuerySetEqual(response.context['comments'], comments)
