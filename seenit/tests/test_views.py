@@ -303,3 +303,31 @@ class PostDetailViewTests(ViewsTestCase):
         self.assertEqual(response.context['post_id'], self.post_id)
         self.assertIsInstance(response.context['form'], CommentForm)
         self.assertQuerySetEqual(response.context['comments'], comments)
+
+
+class PostDetailFormViewTests(ViewsTestCase):
+    def test_call_view_logged_out(self):
+        response = self.client.post(
+            reverse("seenit:post_detail", kwargs={'channel_id': 1, 'pk': 1}),
+            data={'text': 'comment text'})
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.post(
+            reverse("seenit:post_detail",
+                    kwargs={
+                        'channel_id': 1, 'pk': 1}),
+            data={'text': 'comment text'},
+            follow=True)
+        self.assertTemplateUsed(response, 'registration/login.html')
+
+    def test_call_view_logged_in_success(self):
+        self.client.login(username="test", password="secret")
+        response = self.client.post(
+            reverse("seenit:post_detail",
+                    kwargs={"pk": self.post_id,
+                            'channel_id': self.channel_id}),
+            data={"text": "new comment text"},
+            follow=True)
+
+        self.assertTemplateUsed(response, 'seenit/post_detail.html')
+        self.assertContains(response, "new comment text")
