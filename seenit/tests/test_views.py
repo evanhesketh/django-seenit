@@ -23,6 +23,11 @@ class ViewsTestCase(TestCase):
 
         self.post_id = post.id
 
+        comment = Comment(text="comment text", post=post, user=user)
+        comment.save()
+
+        self.comment_id = comment.id
+
 
 class HomeViewTests(ViewsTestCase):
     def test_logged_out(self):
@@ -331,3 +336,31 @@ class PostDetailFormViewTests(ViewsTestCase):
 
         self.assertTemplateUsed(response, 'seenit/post_detail.html')
         self.assertContains(response, "new comment text")
+
+
+class HandleReplyTests(ViewsTestCase):
+    def test_call_view_logged_out(self):
+        response = self.client.post(
+            reverse("seenit:reply", kwargs={
+                    'channel_id': 1, 'post_id': 1, 'pk': 1}),
+            data={'text': 'reply to comment'})
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.post(
+            reverse("seenit:reply", kwargs={
+                    'channel_id': 1, 'post_id': 1, 'pk': 1}),
+            data={'text': 'reply to comment'}, follow=True)
+        self.assertTemplateUsed(response, 'registration/login.html')
+
+    def test_call_view_logged_in_success(self):
+        self.client.login(username="test", password="secret")
+        response = self.client.post(
+            reverse("seenit:reply",
+                    kwargs={"pk": self.comment_id,
+                            'channel_id': self.channel_id,
+                            'post_id': self.post_id}),
+            data={"text": "new reply text"},
+            follow=True)
+
+        self.assertTemplateUsed(response, 'seenit/post_detail.html')
+        self.assertContains(response, "new reply text")
