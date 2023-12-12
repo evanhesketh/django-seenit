@@ -253,6 +253,7 @@ class PostView(View):
         return view(request, *args, **kwargs)
 
 
+@login_required
 def handle_reply(request, *args, **kwargs):
     """Handle reply to a comment.
     Create reply and add to db
