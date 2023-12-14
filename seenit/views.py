@@ -274,6 +274,7 @@ def handle_reply(request, *args, **kwargs):
                 ))
 
 
+@login_required
 def upvote(request, **kwargs):
     """Handle upvote for a post or comment.
     Redirect to same page
@@ -295,6 +296,7 @@ def upvote(request, **kwargs):
     return HttpResponseForbidden()
 
 
+@login_required
 def downvote(request, **kwargs):
     """Handle downvote for a post or comment.
     Redirect to same page
